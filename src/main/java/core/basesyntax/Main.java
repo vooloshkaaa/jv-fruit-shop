@@ -1,5 +1,6 @@
 package core.basesyntax;
 
+import core.basesyntax.model.FruitTransaction;
 import core.basesyntax.service.DataConverter;
 import core.basesyntax.service.FileReader;
 import core.basesyntax.service.FileWriter;
@@ -41,10 +42,11 @@ public class Main {
         // 4. Process the incoming transactions with applicable OperationHandler implementations
         ShopService shopService = new ShopServiceImpl(operationStrategy);
         shopService.process(transactions);
+        Map<String, Integer> finalInventory = shopService.process(transactions);
 
         // 5.Generate report based on the current Storage state
         ReportGenerator reportGenerator = new ReportGeneratorImpl();
-        String resultingReport = reportGenerator.getReport(Storage.getInventory());
+        String resultingReport = reportGenerator.getReport(finalInventory);
 
         // 6. Write the received report into the destination file
         FileWriter fileWriter = new FileWriterImpl();

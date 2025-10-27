@@ -1,19 +1,17 @@
 package core.basesyntax.strategy;
 
-import core.basesyntax.FruitTransaction;
-import core.basesyntax.Storage;
+import core.basesyntax.model.FruitTransaction;
+import java.util.Map;
 
 public class PurchaseOperation implements OperationHandler {
     @Override
-    public void handle(FruitTransaction transaction) {
-        if (transaction.getQuantity() < 0) {
-            throw new IllegalArgumentException("Purchase quantity cannot be negative for fruits");
+    public void apply(FruitTransaction transaction, Map<String, Integer> inventory) {
+        String fruit = transaction.getFruit();
+        int current = inventory.getOrDefault(fruit, 0);
+        int newQuantity = current - transaction.getQuantity();
+        if (newQuantity < 0) {
+            throw new RuntimeException("Not enough " + fruit + " in stock for purchase");
         }
-        int currentQuantity = Storage.getInventory().getOrDefault(transaction.getFruit(), 0);
-        if (currentQuantity < transaction.getQuantity()) {
-            throw new IllegalArgumentException("Not enough " + transaction.getFruit()
-                    + " in stock. Available: " + currentQuantity);
-        }
-        Storage.updateInventory(transaction.getFruit(), -transaction.getQuantity());
+        inventory.put(fruit, newQuantity);
     }
 }
